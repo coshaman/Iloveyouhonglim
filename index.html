@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>강의실 시뮬레이터</title>
+  <title>3D 강의실 시뮬레이터</title>
   <style>
     * {
       box-sizing: border-box;
@@ -19,22 +19,23 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      padding: 16px;
     }
 
     .app {
       width: 100%;
-      max-width: 1100px;
+      max-width: 1360px;
       padding: 24px;
-      border-radius: 18px;
+      border-radius: 20px;
       background: rgba(15, 23, 42, 0.06);
-      backdrop-filter: blur(16px);
-      box-shadow: 0 22px 55px rgba(15, 23, 42, 0.35);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 26px 60px rgba(15, 23, 42, 0.45);
       display: grid;
-      grid-template-columns: minmax(270px, 320px) 1fr;
-      gap: 20px;
+      grid-template-columns: minmax(280px, 320px) minmax(0, 1.4fr);
+      gap: 22px;
     }
 
-    @media (max-width: 840px) {
+    @media (max-width: 880px) {
       .app {
         grid-template-columns: 1fr;
       }
@@ -42,8 +43,8 @@
 
     .panel {
       padding: 18px 18px 14px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.96);
       border: 1px solid rgba(148, 163, 184, 0.4);
       display: flex;
       flex-direction: column;
@@ -51,14 +52,15 @@
     }
 
     .panel h1 {
-      font-size: 1.3rem;
+      font-size: 1.35rem;
       margin-bottom: 4px;
       color: #0f172a;
+      letter-spacing: -0.03em;
     }
 
     .panel p {
       font-size: 0.85rem;
-      opacity: 0.8;
+      opacity: 0.85;
       line-height: 1.4;
       color: #1f2937;
     }
@@ -71,8 +73,14 @@
     }
 
     .control-group {
-      margin-top: 8px;
-      margin-bottom: 2px;
+      margin-top: 6px;
+      margin-bottom: 4px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed rgba(148, 163, 184, 0.5);
+    }
+
+    .control-group:last-of-type {
+      border-bottom: none;
     }
 
     .control-row {
@@ -80,20 +88,22 @@
       align-items: center;
       gap: 10px;
       margin-top: 6px;
+      flex-wrap: wrap;
     }
 
     label {
       font-size: 0.8rem;
       opacity: 0.85;
       color: #111827;
+      min-width: 38px;
     }
 
     input[type="color"] {
-      width: 44px;
-      height: 26px;
+      width: 48px;
+      height: 28px;
       padding: 0;
-      border-radius: 6px;
-      border: 1px solid rgba(148, 163, 184, 0.8);
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.9);
       background: transparent;
       cursor: pointer;
     }
@@ -147,12 +157,51 @@
       color: #4b5563;
     }
 
+    .desk-counter {
+      font-size: 0.8rem;
+      color: #111827;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(241, 245, 249, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
+    .small-btn {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      background: rgba(248, 250, 252, 0.95);
+      cursor: pointer;
+      font-size: 0.78rem;
+      transition: background 0.2s ease, transform 0.1s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .small-btn:hover {
+      background: rgba(239, 246, 255, 0.9);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(148, 163, 184, 0.6);
+    }
+
     .room-wrapper {
       position: relative;
-      border-radius: 14px;
+      border-radius: 16px;
       overflow: hidden;
       border: 1px solid rgba(148, 163, 184, 0.8);
       background: #e5ecff;
+      display: flex;
+      flex-direction: column;
+      /* 🔥 세로 비율을 키움: 4:3 + 최소 높이 */
+      aspect-ratio: 5 / 3;
+      min-height: 520px;
+      min-width: 0;
+    }
+
+    @media (max-width: 880px) {
+      .room-wrapper {
+        aspect-ratio: auto;
+        height: 460px;
+      }
     }
 
     .room-header {
@@ -194,209 +243,37 @@
       box-shadow: 0 0 8px rgba(250, 204, 21, 0.95);
     }
 
+    #lightLabel {
+      white-space: nowrap;
+    }
+
     .room-canvas {
       position: relative;
-      height: 420px;
-      padding: 10px;
+      flex: 1;
       background: #e5ecff;
-      transition: filter 0.25s ease, background-color 0.25s ease;
+      min-height: 0;
     }
 
-    .room-inner {
-      position: relative;
+    #scene3D {
       width: 100%;
       height: 100%;
-      border-radius: 12px;
-      overflow: hidden;
-      background: linear-gradient(
-        180deg,
-        #f9fbff 0,
-        #edf3ff 40%,
-        #e4ecff 75%,
-        #dde7ff 100%
-      );
-      box-shadow: 0 18px 38px rgba(15, 23, 42, 0.25),
-        inset 0 0 40px rgba(148, 163, 184, 0.15);
-      border: 1px solid rgba(148, 163, 184, 0.7);
-    }
-
-    .wall-accent {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background: radial-gradient(circle at 20% 0%, rgba(59, 130, 246, 0.26) 0,
-          transparent 45%),
-        radial-gradient(circle at 80% 5%, rgba(129, 140, 248, 0.2) 0,
-          transparent 50%);
-      mix-blend-mode: screen;
-      opacity: 0.8;
-    }
-
-    .blackboard {
-      position: absolute;
-      top: 22px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 75%;
-      height: 80px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #14532d, #052e16);
-      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(167, 243, 208, 0.7);
-      overflow: hidden;
-    }
-
-    .blackboard::before {
-      content: "CLASSROOM SIM";
-      position: absolute;
-      left: 18px;
-      bottom: 14px;
-      font-size: 0.9rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: rgba(240, 253, 250, 0.94);
-    }
-
-    .blackboard::after {
-      content: "";
-      position: absolute;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      width: 40%;
-      background-image: url("https://png.pngtree.com/png-vector/20220609/ourmid/pngtree-school-classroom-desks-and-chairs-png-image_4870679.png");
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center right 6px;
-      opacity: 0.55;
-      filter: saturate(0.9);
-    }
-
-    .teacher-desk {
-      position: absolute;
-      top: 118px;
-      left: calc(50% + var(--teacher-offset, 0px));
-      transform: translateX(-50%);
-      width: 110px;
-      height: 40px;
-      border-radius: 9px;
-      background: linear-gradient(145deg, #fbbf77, #c97a32);
-      box-shadow: 0 6px 14px rgba(30, 64, 175, 0.5);
-    }
-
-    .teacher-desk::before {
-      content: "";
-      position: absolute;
-      inset: 3px 4px 8px;
-      border-radius: 7px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.24),
-          rgba(255, 255, 255, 0.06));
-      mix-blend-mode: soft-light;
-      opacity: 0.95;
-    }
-
-    .teacher-chair {
-      position: absolute;
-      top: 154px;
-      left: calc(50% + var(--teacher-offset, 0px));
-      transform: translateX(-50%);
-      width: 46px;
-      height: 26px;
-      background: linear-gradient(145deg, #4b5563, #1f2937);
-      border-radius: 10px 10px 6px 6px;
-      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.68);
-    }
-
-    .teacher-chair::after {
-      content: "";
-      position: absolute;
-      top: -18px;
-      left: 50%;
-      width: 40px;
-      height: 18px;
-      transform: translateX(-50%);
-      border-radius: 10px 10px 4px 4px;
-      background: linear-gradient(135deg, #6b7280, #111827);
-    }
-
-    .student-area {
-      position: absolute;
-      left: 4%;
-      right: 4%;
-      bottom: 20px;
-      top: 180px;
-    }
-
-    .desk {
-      position: absolute;
-      width: 80px;
-      height: 52px;
-      border-radius: 9px;
-      background: linear-gradient(145deg, #fed7aa, #f97316);
-      box-shadow: 0 8px 17px rgba(15, 23, 42, 0.55);
-      transition: transform 0.6s ease, left 0.6s ease, top 0.6s ease;
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      padding-bottom: 3px;
-    }
-
-    .desk::before {
-      content: "";
-      position: absolute;
-      inset: 3px 4px 16px;
-      border-radius: 7px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.18),
-          rgba(255, 255, 255, 0.06));
-      opacity: 0.95;
-      pointer-events: none;
-    }
-
-    .desk .chair {
-      position: relative;
-      width: 60%;
-      height: 20px;
-      border-radius: 8px 8px 4px 4px;
-      background: linear-gradient(145deg, #4b5563, #111827);
-      box-shadow: 0 3px 8px rgba(15, 23, 42, 0.8);
-    }
-
-    .desk .chair::after {
-      content: "";
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      height: 12px;
-      border-radius: 8px 8px 4px 4px;
-      background: linear-gradient(135deg, #6b7280, #111827);
-    }
-
-    .desk label {
-      position: absolute;
-      top: 2px;
-      right: 6px;
-      font-size: 0.65rem;
-      opacity: 0.85;
-      color: #7c2d12;
-      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+      display: block;
     }
 
     .status-bar {
-      margin-top: 4px;
-      padding: 6px 10px 8px;
+      margin-top: 0;
+      padding: 7px 10px 9px;
       font-size: 0.75rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(15, 23, 42, 0.8);
-      border-top: 1px solid rgba(148, 163, 184, 0.8);
+      background: rgba(15, 23, 42, 0.9);
+      border-top: 1px solid rgba(148, 163, 184, 0.95);
       color: #e5edff;
     }
 
     .status-layout {
-      opacity: 0.9;
+      opacity: 0.95;
     }
 
     .status-hint {
@@ -409,10 +286,10 @@
   <div class="app">
     <div class="panel">
       <div>
-        <h1>강의실 시뮬레이터</h1>
+        <h1>3D 강의실 시뮬레이터</h1>
         <p>
-          배경 색감과 조도를 조절하고, 책상/의자 배치를 바꾸면서
-          강의실 분위기를 실험해 볼 수 있어.
+          실제 강의실처럼 책상·의자·칠판이 있는 3D 공간에서
+          배경 색감·조도·배치·책상 수를 바꿔 보면서 분위기를 실험해 볼 수 있어.
         </p>
       </div>
 
@@ -423,8 +300,7 @@
           <input type="color" id="colorPicker" value="#3a6ea5" />
         </div>
         <div class="info-note">
-          벽·바닥 전체 톤이 선택한 색으로 강하게 바뀌어. 집중/몰입
-          컨셉 색을 골라봐.
+          벽·바닥 톤이 선택한 색으로 살짝 물들어. 컨셉 컬러(포레스트, 코퍼, 그래파이트 등)를 골라봐.
         </div>
       </div>
 
@@ -437,13 +313,12 @@
             id="brightnessRange"
             min="60"
             max="180"
-            value="110"
+            value="115"
           />
           <span style="font-size: 0.8rem; opacity: 0.8">밝음</span>
         </div>
         <div class="info-note">
-          조도를 높이면 실제 교실 형광등을 더 켠 것처럼 확실히
-          밝아져. (최대값은 꽤 눈부신 수준)
+          형광등 밝기처럼 전체 조명이 바뀌어. 값이 높을수록 강의실이 더 환해져.
         </div>
       </div>
 
@@ -461,8 +336,7 @@
           <span style="font-size: 0.8rem; opacity: 0.8">오른쪽</span>
         </div>
         <div class="info-note">
-          강의대와 교수자 의자가 함께 움직여. 좌우 배치에 따라
-          학생 배치도 다르게 느껴질 수 있어.
+          강의대와 교수자 위치가 좌우로 이동해. 시야와 동선에 어떤 느낌 차이가 나는지 확인해봐.
         </div>
       </div>
 
@@ -470,12 +344,23 @@
         <div class="section-title">책상/의자 배치</div>
         <div class="layout-buttons">
           <button class="layout-btn active" data-layout="rows">줄세우기</button>
-          <button class="layout-btn" data-layout="groups">모둠형 (4-4-4)</button>
+          <button class="layout-btn" data-layout="groups">모둠형</button>
           <button class="layout-btn" data-layout="u-shape">U자 배치</button>
         </div>
         <div class="info-note">
-          버튼을 누를 때마다 책상이 부드럽게 움직이면서 배치가
-          바뀌어. 학생 수는 12명으로 가정했어 (4명×3모둠).
+          버튼을 누르면 책상이 3D 공간에서 부드럽게 이동하면서 배치가 바뀌어.
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="section-title">책상 개수 (4개씩 증감)</div>
+        <div class="control-row">
+          <button class="small-btn" id="deskMinus">－ 4개</button>
+          <span class="desk-counter" id="deskCounter">현재: 12개 (학생 12명)</span>
+          <button class="small-btn" id="deskPlus">＋ 4개</button>
+        </div>
+        <div class="info-note">
+          모둠 배치를 감안해서 책상을 한 번에 4개씩 늘리거나 줄일 수 있어.
         </div>
       </div>
     </div>
@@ -483,224 +368,448 @@
     <div class="room-wrapper">
       <div class="room-header">
         <div>
-          <div class="room-header-title">가상 강의실</div>
-          <div class="room-header-sub">배경/조도/배치 실험 공간</div>
+          <div class="room-header-title">가상 3D 강의실</div>
+          <div class="room-header-sub">실사 느낌의 배치·조명 실험 공간</div>
         </div>
         <div class="room-light-indicator">
           <span class="room-light-dot" id="lightDot"></span>
-          <span id="lightLabel">조도: 110%</span>
+          <span id="lightLabel">조도: 115%</span>
         </div>
       </div>
-      <div class="room-canvas" id="roomCanvas">
-        <div class="room-inner" id="roomInner">
-          <div class="wall-accent"></div>
-          <div class="blackboard"></div>
-          <div class="teacher-desk"></div>
-          <div class="teacher-chair"></div>
-          <div class="student-area" id="studentArea"></div>
-        </div>
+
+      <div class="room-canvas">
+        <canvas id="scene3D"></canvas>
       </div>
+
       <div class="status-bar">
         <div class="status-layout" id="layoutStatus">현재 배치: 줄세우기</div>
-        <div class="status-hint">배치 버튼을 눌러 책상을 움직여 보세요.</div>
+        <div class="status-hint">좌측 컨트롤로 조명·책상 수·배치를 바꿔 보세요.</div>
       </div>
     </div>
   </div>
 
-  <script>
-    const studentArea = document.getElementById("studentArea");
-    const layoutButtons = document.querySelectorAll(".layout-btn");
-    const layoutStatus = document.getElementById("layoutStatus");
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.161.0/build/three.module.js';
+
     const colorPicker = document.getElementById("colorPicker");
     const brightnessRange = document.getElementById("brightnessRange");
-    const roomCanvas = document.getElementById("roomCanvas");
-    const roomInner = document.getElementById("roomInner");
-    const wallAccent = document.querySelector(".wall-accent");
+    const teacherPosRange = document.getElementById("teacherPosRange");
     const lightLabel = document.getElementById("lightLabel");
     const lightDot = document.getElementById("lightDot");
-    const teacherPosRange = document.getElementById("teacherPosRange");
+    const layoutButtons = document.querySelectorAll(".layout-btn");
+    const layoutStatus = document.getElementById("layoutStatus");
+    const deskMinusBtn = document.getElementById("deskMinus");
+    const deskPlusBtn = document.getElementById("deskPlus");
+    const deskCounter = document.getElementById("deskCounter");
+    const canvas = document.getElementById("scene3D");
 
-    const deskCount = 12;
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xe5ecff);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const camera = new THREE.PerspectiveCamera(
+      35,
+      canvas.clientWidth / canvas.clientHeight,
+      0.1,
+      100
+    );
+    camera.position.set(0, 7.5, 18);
+    camera.lookAt(0, 3, 0);
+    scene.add(camera);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    scene.add(ambientLight);
+
+    const mainLight = new THREE.DirectionalLight(0xffffff, 0.85);
+    mainLight.position.set(6, 12, 6);
+    mainLight.castShadow = true;
+    mainLight.shadow.mapSize.width = 2048;
+    mainLight.shadow.mapSize.height = 2048;
+    mainLight.shadow.camera.near = 1;
+    mainLight.shadow.camera.far = 40;
+    mainLight.shadow.camera.left = -20;
+    mainLight.shadow.camera.right = 20;
+    mainLight.shadow.camera.top = 20;
+    mainLight.shadow.camera.bottom = -10;
+    scene.add(mainLight);
+
+    const fillLight = new THREE.DirectionalLight(0xbfd0ff, 0.4);
+    fillLight.position.set(-8, 10, -6);
+    scene.add(fillLight);
+
+    const floorGeom = new THREE.PlaneGeometry(30, 24);
+    const floorMat = new THREE.MeshStandardMaterial({
+      color: 0xd8c3a5,
+      roughness: 0.55,
+      metalness: 0.05,
+    });
+    const floor = new THREE.Mesh(floorGeom, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = 0;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    const backWallGeom = new THREE.PlaneGeometry(30, 12);
+    const backWallMat = new THREE.MeshStandardMaterial({
+      color: 0xf4f5fb,
+      roughness: 0.8,
+      metalness: 0.0,
+    });
+    const backWall = new THREE.Mesh(backWallGeom, backWallMat);
+    backWall.position.set(0, 6, -10.5);
+    scene.add(backWall);
+
+    const sideWallGeom = new THREE.PlaneGeometry(24, 12);
+    const sideWallMat = new THREE.MeshStandardMaterial({
+      color: 0xf6f7ff,
+      roughness: 0.85,
+      metalness: 0.0,
+    });
+    const leftWall = new THREE.Mesh(sideWallGeom, sideWallMat);
+    leftWall.position.set(-15, 6, 0);
+    leftWall.rotation.y = Math.PI / 2;
+    scene.add(leftWall);
+
+    const rightWall = new THREE.Mesh(sideWallGeom, sideWallMat.clone());
+    rightWall.position.set(15, 6, 0);
+    rightWall.rotation.y = -Math.PI / 2;
+    scene.add(rightWall);
+
+    const boardGeom = new THREE.BoxGeometry(10, 2.4, 0.15);
+    const boardMat = new THREE.MeshStandardMaterial({
+      color: 0x123524,
+      roughness: 0.4,
+      metalness: 0.1,
+    });
+    const board = new THREE.Mesh(boardGeom, boardMat);
+    board.position.set(0, 5.2, -9.95);
+    board.castShadow = true;
+    scene.add(board);
+
+    const frameGeom = new THREE.BoxGeometry(10.2, 2.6, 0.1);
+    const frameMat = new THREE.MeshStandardMaterial({
+      color: 0x8b5a2b,
+      roughness: 0.6,
+      metalness: 0.1,
+    });
+    const boardFrame = new THREE.Mesh(frameGeom, frameMat);
+    boardFrame.position.copy(board.position);
+    boardFrame.position.z -= 0.08;
+    scene.add(boardFrame);
+
+    const teacherGroup = new THREE.Group();
+
+    const deskTopGeom = new THREE.BoxGeometry(2.6, 0.15, 1.1);
+    const deskTopMat = new THREE.MeshStandardMaterial({
+      color: 0xc88d4d,
+      roughness: 0.5,
+      metalness: 0.1,
+    });
+    const teacherDeskTop = new THREE.Mesh(deskTopGeom, deskTopMat);
+    teacherDeskTop.position.set(0, 1.1, -7.2);
+    teacherDeskTop.castShadow = true;
+    teacherDeskTop.receiveShadow = true;
+    teacherGroup.add(teacherDeskTop);
+
+    const tLegGeom = new THREE.CylinderGeometry(0.05, 0.05, 1.1, 14);
+    const tLegMat = new THREE.MeshStandardMaterial({
+      color: 0x343a40,
+      roughness: 0.4,
+      metalness: 0.5,
+    });
+    const tOffsets = [
+      [-1.15, -0.45],
+      [1.15, -0.45],
+      [-1.15, 0.45],
+      [1.15, 0.45],
+    ];
+    tOffsets.forEach(([x, z]) => {
+      const leg = new THREE.Mesh(tLegGeom, tLegMat);
+      leg.position.set(x, 0.55, -7.2 + z);
+      leg.castShadow = true;
+      teacherGroup.add(leg);
+    });
+
+    const chairSeatGeom = new THREE.BoxGeometry(0.9, 0.15, 0.9);
+    const chairMat = new THREE.MeshStandardMaterial({
+      color: 0x2b2f36,
+      roughness: 0.6,
+      metalness: 0.2,
+    });
+    const chairSeat = new THREE.Mesh(chairSeatGeom, chairMat);
+    chairSeat.position.set(0, 0.7, -8.7);
+    chairSeat.castShadow = true;
+    teacherGroup.add(chairSeat);
+
+    const chairBackGeom = new THREE.BoxGeometry(0.9, 1.0, 0.12);
+    const chairBack = new THREE.Mesh(chairBackGeom, chairMat);
+    chairBack.position.set(0, 1.35, -9.1);
+    chairBack.castShadow = true;
+    teacherGroup.add(chairBack);
+
+    scene.add(teacherGroup);
+
     const desks = [];
+    let currentDeskCount = 12;
+    const minDesks = 4;
+    const maxDesks = 40;
+    let currentLayout = "rows";
 
-    // 책상 생성
-    for (let i = 0; i < deskCount; i++) {
-      const desk = document.createElement("div");
-      desk.className = "desk";
-      const chair = document.createElement("div");
-      chair.className = "chair";
-      const label = document.createElement("label");
-      label.textContent = i + 1;
-      desk.appendChild(chair);
-      desk.appendChild(label);
-      studentArea.appendChild(desk);
-      desks.push(desk);
+    function createDeskGroup() {
+      const group = new THREE.Group();
+
+      const topGeom = new THREE.BoxGeometry(2.0, 0.12, 1.1);
+      const topMat = new THREE.MeshStandardMaterial({
+        color: 0xd9a066,
+        roughness: 0.45,
+        metalness: 0.1,
+      });
+      const top = new THREE.Mesh(topGeom, topMat);
+      top.position.set(0, 1.0, 0);
+      top.castShadow = true;
+      top.receiveShadow = true;
+      group.add(top);
+
+      const legGeom = new THREE.CylinderGeometry(0.06, 0.06, 0.95, 12);
+      const legMat = new THREE.MeshStandardMaterial({
+        color: 0x3a3f4b,
+        roughness: 0.4,
+        metalness: 0.5,
+      });
+      const legOffsets = [
+        [-0.85, -0.4],
+        [0.85, -0.4],
+        [-0.85, 0.4],
+        [0.85, 0.4],
+      ];
+      legOffsets.forEach(([x, z]) => {
+        const leg = new THREE.Mesh(legGeom, legMat);
+        leg.position.set(x, 0.52, z);
+        leg.castShadow = true;
+        group.add(leg);
+      });
+
+      const seatGeom = new THREE.BoxGeometry(1.3, 0.12, 0.9);
+      const seatMat = new THREE.MeshStandardMaterial({
+        color: 0x2f3744,
+        roughness: 0.6,
+        metalness: 0.2,
+      });
+      const seat = new THREE.Mesh(seatGeom, seatMat);
+      seat.position.set(0, 0.7, 0.3);
+      seat.castShadow = true;
+      group.add(seat);
+
+      const backGeom = new THREE.BoxGeometry(1.3, 0.9, 0.12);
+      const back = new THREE.Mesh(backGeom, seatMat);
+      back.position.set(0, 1.2, -0.05);
+      back.castShadow = true;
+      group.add(back);
+
+      group.castShadow = true;
+      group.receiveShadow = true;
+      scene.add(group);
+      return group;
     }
 
-    function getLayoutPositions(layout) {
-      const w = studentArea.clientWidth;
-      const h = studentArea.clientHeight;
+    function syncDeskCount() {
+      const target = currentDeskCount;
+      while (desks.length < target) {
+        desks.push(createDeskGroup());
+      }
+      while (desks.length > target) {
+        const d = desks.pop();
+        scene.remove(d);
+      }
+      deskCounter.textContent = `현재: ${currentDeskCount}개 (학생 ${currentDeskCount}명)`;
+      applyLayout(currentLayout);
+    }
 
+    function layoutRows() {
       const positions = [];
+      const cols = 4;
+      const rows = Math.ceil(currentDeskCount / cols);
+      const startX = -6;
+      const endX = 6;
+      const zStart = 2;
+      const zStep = 2.7;
 
-      if (layout === "rows") {
-        const rows = 3;
-        const cols = 4;
-        const marginX = w * 0.04;
-        const marginY = h * 0.08;
-        const innerW = w - marginX * 2;
-        const innerH = h - marginY * 2;
-        const stepX = innerW / (cols - 1);
-        const stepY = innerH / (rows - 1);
-
-        let idx = 0;
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-            if (idx >= deskCount) break;
-            const x = marginX + c * stepX;
-            const y = marginY + r * stepY;
-            positions.push({ left: x, top: y });
-            idx++;
-          }
-        }
-      } else if (layout === "groups") {
-        // 4명씩 x 3모둠
-        const groupCenters = [
-          { x: w * 0.22, y: h * 0.35 },
-          { x: w * 0.5, y: h * 0.7 },
-          { x: w * 0.78, y: h * 0.35 },
-        ];
-        const offsets = [
-          { x: -30, y: -22 },
-          { x: 30, y: -22 },
-          { x: -30, y: 22 },
-          { x: 30, y: 22 },
-        ];
-
-        let idx = 0;
-        for (let g = 0; g < groupCenters.length; g++) {
-          for (let k = 0; k < offsets.length; k++) {
-            if (idx >= deskCount) break;
-            const cx = groupCenters[g].x;
-            const cy = groupCenters[g].y;
-            const off = offsets[k];
-            positions.push({ left: cx + off.x, top: cy + off.y });
-            idx++;
-          }
-        }
-      } else if (layout === "u-shape") {
-        const leftX = w * 0.1;
-        const rightX = w * 0.9;
-        const topY = h * 0.15;
-        const bottomY = h * 0.85;
-
-        const sideCount = 4;
-        const vertStep = (bottomY - topY) / (sideCount - 1);
-
-        let idx = 0;
-        for (let i = 0; i < sideCount && idx < deskCount; i++) {
-          const y = topY + i * vertStep;
-          positions.push({ left: leftX, top: y });
-          idx++;
-        }
-        for (let i = 0; i < sideCount && idx < deskCount; i++) {
-          const y = topY + i * vertStep;
-          positions.push({ left: rightX, top: y });
-          idx++;
-        }
-
-        const bottomCount = Math.min(4, deskCount - positions.length);
-        if (bottomCount > 0) {
-          const stepX = (rightX - leftX) / (bottomCount + 1);
-          for (let i = 1; i <= bottomCount && idx < deskCount; i++) {
-            const x = leftX + stepX * i;
-            positions.push({ left: x, top: bottomY });
-            idx++;
-          }
-        }
-
-        while (positions.length < deskCount) {
-          positions.push({
-            left: w * 0.5 + (positions.length - deskCount / 2) * 10,
-            top: h * 0.5,
-          });
-        }
+      for (let i = 0; i < currentDeskCount; i++) {
+        const r = Math.floor(i / cols);
+        const c = i % cols;
+        const x = THREE.MathUtils.lerp(startX, endX, cols === 1 ? 0.5 : c / (cols - 1));
+        const z = zStart + r * zStep;
+        positions.push({ x, z });
       }
-
-      while (positions.length < deskCount) {
-        positions.push({ left: w / 2, top: h / 2 });
-      }
-
       return positions;
     }
 
-    let currentLayout = "rows";
+    function layoutGroups() {
+      const positions = [];
+      const groupSize = 4;
+      const groups = currentDeskCount / groupSize;
+      const rowCount = Math.ceil(groups / 3);
+      const baseZ = 3;
+      const rowZStep = 3.0;
+      let groupIndex = 0;
 
-    function applyLayout(layout, animate = true) {
-      currentLayout = layout;
-      const positions = getLayoutPositions(layout);
-
-      if (!animate) {
-        desks.forEach((desk) => {
-          desk.style.transition = "none";
-        });
-      } else {
-        desks.forEach((desk) => {
-          desk.style.transition =
-            "transform 0.6s ease, left 0.6s ease, top 0.6s ease";
-        });
+      for (let row = 0; row < rowCount; row++) {
+        const inRow = Math.min(3, groups - groupIndex);
+        const xs = [-6.5, 0, 6.5];
+        for (let i = 0; i < inRow; i++) {
+          const cx = xs[i];
+          const cz = baseZ + row * rowZStep;
+          const offsets = [
+            [-0.9, -0.7],
+            [0.9, -0.7],
+            [-0.9, 0.7],
+            [0.9, 0.7],
+          ];
+          for (let k = 0; k < groupSize; k++) {
+            const globalIndex = groupIndex * groupSize + k;
+            if (globalIndex >= currentDeskCount) break;
+            const off = offsets[k];
+            positions[globalIndex] = {
+              x: cx + off[0],
+              z: cz + off[1],
+            };
+          }
+          groupIndex++;
+        }
       }
+      return positions;
+    }
+const TEACHER_Z = teacherDeskTop.position.z;
+// 🔹 U자 배치: 강의자를 중심으로 주변을 둘러싸는 형태
+function layoutUShape() {
+  const positions = [];
+  const total = currentDeskCount;
+  if (total === 0) return positions;
 
-      desks.forEach((desk, i) => {
-        const pos = positions[i];
-        const deskWidth = desk.offsetWidth || 80;
-        const deskHeight = desk.offsetHeight || 52;
-        desk.style.left = `${pos.left - deskWidth / 2}px`;
-        desk.style.top = `${pos.top - deskHeight / 2}px`;
-      });
+  // 교수자 현재 위치 (슬라이더로 좌우 이동하면 같이 따라감)
+  const centerX = teacherGroup.position.x;
+  const teacherZ = TEACHER_Z; // -7.2 근처
+
+  // U자 크기·위치 설정
+  //  - 양옆 팔: 강의자를 기준으로 좌우로 6씩
+  //  - 앞쪽(카메라 쪽) 줄: 강의자보다 z가 큰 쪽 (카메라에 더 가까움)
+  //  - 뒤쪽(칠판 쪽)은 살짝만 올라가게
+  const leftX = centerX - 6.0;
+  const rightX = centerX + 6.0;
+
+  const nearZ = teacherZ + 4.0;  // 카메라 쪽 (예: -3.2)
+  const farZ = teacherZ - 1.5;   // 칠판 쪽 (예: -8.7)
+
+  // 전체 책상 수를 좌측·우측·앞줄로 나눔
+  const sidePer = Math.max(2, Math.floor(total / 3));   // 왼쪽·오른쪽 각각 개수
+  const bottomPer = Math.max(0, total - sidePer * 2);   // 앞줄 개수
+
+  const sideStepZ = sidePer > 1 ? (nearZ - farZ) / (sidePer - 1) : 0;
+
+  let idx = 0;
+
+  // 왼쪽 팔
+  for (let i = 0; i < sidePer && idx < total; i++) {
+    const z = farZ + i * sideStepZ;
+    positions[idx++] = { x: leftX, z };
+  }
+
+  // 오른쪽 팔
+  for (let i = 0; i < sidePer && idx < total; i++) {
+    const z = farZ + i * sideStepZ;
+    positions[idx++] = { x: rightX, z };
+  }
+
+  // 앞줄 (카메라 쪽, 강의자를 바라보는 부분)
+  if (bottomPer > 0) {
+    const startX = leftX + 1.4;
+    const endX = rightX - 1.4;
+    const bottomStepX =
+      bottomPer > 1 ? (endX - startX) / (bottomPer - 1) : 0;
+
+    for (let i = 0; i < bottomPer && idx < total; i++) {
+      const x = startX + i * bottomStepX;
+      const z = nearZ;
+      positions[idx++] = { x, z };
+    }
+  }
+
+  return positions;
+}
+
+
+    function applyLayout(layout) {
+      currentLayout = layout;
+
+      let positions;
+      if (layout === "rows") positions = layoutRows();
+      else if (layout === "groups") positions = layoutGroups();
+      else positions = layoutUShape();
+
+      for (let i = 0; i < currentDeskCount; i++) {
+        const g = desks[i];
+        const pos = positions[i] || { x: 0, z: 5 };
+        g.userData.targetX = pos.x;
+        g.userData.targetZ = pos.z;
+      }
 
       layoutButtons.forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.layout === layout);
       });
 
       let layoutName = "줄세우기";
-      if (layout === "groups") layoutName = "모둠형 (4-4-4)";
+      if (layout === "groups") layoutName = "모둠형";
       if (layout === "u-shape") layoutName = "U자 배치";
       layoutStatus.textContent = `현재 배치: ${layoutName}`;
     }
 
-    function updateBackgroundColor(color) {
-      // 교실 전체 색감을 선택한 컬러 중심으로 크게 바꿔줌
-      roomInner.style.background = `linear-gradient(
-        180deg,
-        ${hexToRgba(color, 0.95)} 0%,
-        ${hexToRgba(color, 0.75)} 35%,
-        ${hexToRgba(color, 0.55)} 65%,
-        rgba(244, 247, 255, 1) 100%
-      )`;
-
-      roomInner.style.boxShadow = `0 20px 40px ${hexToRgba(
-        color,
-        0.4
-      )}, inset 0 0 40px rgba(15,23,42,0.18)`;
-
-      if (wallAccent) {
-        wallAccent.style.background = `
-          radial-gradient(circle at 20% 0%, ${hexToRgba(
-            color,
-            0.45
-          )} 0, transparent 45%),
-          radial-gradient(circle at 80% 5%, ${hexToRgba(
-            color,
-            0.3
-          )} 0, transparent 50%)
-        `;
+    function hexToRgb(hex) {
+      let c = hex.replace("#", "");
+      if (c.length === 3) {
+        c = c.split("").map((x) => x + x).join("");
       }
+      const r = parseInt(c.slice(0, 2), 16) / 255;
+      const g = parseInt(c.slice(2, 4), 16) / 255;
+      const b = parseInt(c.slice(4, 6), 16) / 255;
+      return { r, g, b };
+    }
+
+    function updateBackgroundColor(color) {
+      const { r, g, b } = hexToRgb(color);
+      const wallBase = new THREE.Color(0xf4f5fb);
+      const floorBase = new THREE.Color(0xd8c3a5);
+
+      const tint = new THREE.Color(r, g, b);
+      const mixWall = wallBase.clone().lerp(tint, 0.18);
+      const mixSide = wallBase.clone().lerp(tint, 0.12);
+      const mixFloor = floorBase.clone().lerp(tint, 0.16);
+
+      backWall.material.color.copy(mixWall);
+      leftWall.material.color.copy(mixSide);
+      rightWall.material.color.copy(mixSide);
+      floor.material.color.copy(mixFloor);
+
+      const bgColor = new THREE.Color().lerpColors(
+        new THREE.Color(0xe5ecff),
+        tint,
+        0.1
+      );
+      scene.background = bgColor;
     }
 
     function updateBrightness(value) {
-      const brightness = value / 100; // 0.6 ~ 1.8
-      roomCanvas.style.filter = `brightness(${brightness})`;
+      const factor = value / 100;
+      ambientLight.intensity = 0.55 * factor;
+      mainLight.intensity = 0.85 * factor;
+      fillLight.intensity = 0.4 * factor;
+
       lightLabel.textContent = `조도: ${value}%`;
 
       if (value < 80) {
@@ -715,54 +824,82 @@
       }
     }
 
-    function hexToRgba(hex, alpha) {
-      let c = hex.replace("#", "");
-      if (c.length === 3) {
-        c = c
-          .split("")
-          .map((x) => x + x)
-          .join("");
-      }
-      const r = parseInt(c.substring(0, 2), 16);
-      const g = parseInt(c.substring(2, 4), 16);
-      const b = parseInt(c.substring(4, 6), 16);
-      return `rgba(${r},${g},${b},${alpha})`;
+    function updateTeacherPosition(v) {
+      const t = (parseInt(v, 10) || 0) / 120;
+      const offsetX = t * 4.0;
+      teacherGroup.position.x = offsetX;
     }
 
-    // 배치 버튼 이벤트
     layoutButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
         const layout = btn.dataset.layout;
         if (layout === currentLayout) return;
-        applyLayout(layout, true);
+        applyLayout(layout);
       });
     });
 
-    // 색감 조절
     colorPicker.addEventListener("input", (e) => {
       updateBackgroundColor(e.target.value);
     });
 
-    // 조도 조절
     brightnessRange.addEventListener("input", (e) => {
       updateBrightness(e.target.value);
     });
 
-    // 교수자 위치 조절
     teacherPosRange.addEventListener("input", (e) => {
-      const v = parseInt(e.target.value, 10) || 0;
-      roomInner.style.setProperty("--teacher-offset", `${v}px`);
+      updateTeacherPosition(e.target.value);
     });
 
+    deskMinusBtn.addEventListener("click", () => {
+      if (currentDeskCount <= minDesks) return;
+      currentDeskCount -= 4;
+      syncDeskCount();
+    });
+
+    deskPlusBtn.addEventListener("click", () => {
+      if (currentDeskCount >= maxDesks) return;
+      currentDeskCount += 4;
+      syncDeskCount();
+    });
+
+    function onResize() {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      if (height === 0) return;
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener("resize", onResize);
+
+    let lastTime = performance.now();
+    function animate(now) {
+      requestAnimationFrame(animate);
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+
+      const lerpFactor = Math.min(1, dt * 4);
+      desks.forEach((g) => {
+        const tx = g.userData.targetX ?? g.position.x;
+        const tz = g.userData.targetZ ?? g.position.z;
+        g.position.x += (tx - g.position.x) * lerpFactor;
+        g.position.z += (tz - g.position.z) * lerpFactor;
+      });
+
+      const t = now * 0.00015;
+      camera.position.y = 7.5 + Math.sin(t) * 0.1;
+      camera.lookAt(0, 3, 0);
+
+      renderer.render(scene, camera);
+    }
+
     function init() {
+      onResize();
+      syncDeskCount();
       updateBackgroundColor(colorPicker.value);
       updateBrightness(brightnessRange.value);
-      roomInner.style.setProperty("--teacher-offset", "0px");
-      applyLayout("rows", false);
-
-      window.addEventListener("resize", () => {
-        applyLayout(currentLayout, false);
-      });
+      updateTeacherPosition(teacherPosRange.value);
+      animate(performance.now());
     }
 
     window.addEventListener("load", init);
