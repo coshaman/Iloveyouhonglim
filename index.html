@@ -49,6 +49,8 @@
       display: flex;
       flex-direction: column;
       gap: 18px;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     .panel h1 {
@@ -191,8 +193,7 @@
       background: #e5ecff;
       display: flex;
       flex-direction: column;
-      /* 🔥 세로 비율을 키움: 4:3 + 최소 높이 */
-      aspect-ratio: 5 / 3;
+      aspect-ratio: 4 / 3;
       min-height: 520px;
       min-width: 0;
     }
@@ -280,6 +281,34 @@
       opacity: 0.8;
       font-size: 0.72rem;
     }
+
+    #promptPreview {
+      width: 100%;
+      min-height: 110px;
+      max-height: 200px;
+      resize: vertical;
+      padding: 8px 10px;
+      font-size: 0.78rem;
+      line-height: 1.4;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      background: #f9fafb;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      color: #111827;
+    }
+
+    .ai-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .ai-buttons button {
+      flex: 1;
+      min-width: 120px;
+    }
   </style>
 </head>
 <body>
@@ -363,6 +392,19 @@
           모둠 배치를 감안해서 책상을 한 번에 4개씩 늘리거나 줄일 수 있어.
         </div>
       </div>
+
+      <div class="control-group">
+        <div class="section-title">AI용 프롬프트 / 데이터</div>
+        <div class="info-note">
+          아래 내용은 지금 설정된 강의실 상태를 설명하는 프롬프트야.
+          이미지 캡처와 함께 다운로드해서, 생성형 AI에 그대로 넣어 쓰면 돼.
+        </div>
+        <textarea id="promptPreview" readonly></textarea>
+        <div class="ai-buttons">
+          <button class="small-btn" id="refreshPrompt">프롬프트 새로 만들기</button>
+          <button class="small-btn" id="exportAll">캡처+데이터 다운로드</button>
+        </div>
+      </div>
     </div>
 
     <div class="room-wrapper">
@@ -403,12 +445,17 @@
     const deskCounter = document.getElementById("deskCounter");
     const canvas = document.getElementById("scene3D");
 
+    const promptPreview = document.getElementById("promptPreview");
+    const refreshPromptBtn = document.getElementById("refreshPrompt");
+    const exportAllBtn = document.getElementById("exportAll");
+
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xe5ecff);
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
+      preserveDrawingBuffer: true, // ★ 캡처를 위해 버퍼 보존
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
@@ -517,6 +564,8 @@
     teacherDeskTop.castShadow = true;
     teacherDeskTop.receiveShadow = true;
     teacherGroup.add(teacherDeskTop);
+
+    const TEACHER_Z = teacherDeskTop.position.z;
 
     const tLegGeom = new THREE.CylinderGeometry(0.05, 0.05, 1.1, 14);
     const tLegMat = new THREE.MeshStandardMaterial({
@@ -630,6 +679,7 @@
       }
       deskCounter.textContent = `현재: ${currentDeskCount}개 (학생 ${currentDeskCount}명)`;
       applyLayout(currentLayout);
+      updatePromptPreview();
     }
 
     function layoutRows() {
@@ -686,64 +736,53 @@
       }
       return positions;
     }
-const TEACHER_Z = teacherDeskTop.position.z;
-// 🔹 U자 배치: 강의자를 중심으로 주변을 둘러싸는 형태
-function layoutUShape() {
-  const positions = [];
-  const total = currentDeskCount;
-  if (total === 0) return positions;
 
-  // 교수자 현재 위치 (슬라이더로 좌우 이동하면 같이 따라감)
-  const centerX = teacherGroup.position.x;
-  const teacherZ = TEACHER_Z; // -7.2 근처
+    function layoutUShape() {
+      const positions = [];
+      const total = currentDeskCount;
+      if (total === 0) return positions;
 
-  // U자 크기·위치 설정
-  //  - 양옆 팔: 강의자를 기준으로 좌우로 6씩
-  //  - 앞쪽(카메라 쪽) 줄: 강의자보다 z가 큰 쪽 (카메라에 더 가까움)
-  //  - 뒤쪽(칠판 쪽)은 살짝만 올라가게
-  const leftX = centerX - 6.0;
-  const rightX = centerX + 6.0;
+      const centerX = teacherGroup.position.x;
+      const teacherZ = TEACHER_Z;
 
-  const nearZ = teacherZ + 4.0;  // 카메라 쪽 (예: -3.2)
-  const farZ = teacherZ - 1.5;   // 칠판 쪽 (예: -8.7)
+      const leftX = centerX - 6.0;
+      const rightX = centerX + 6.0;
 
-  // 전체 책상 수를 좌측·우측·앞줄로 나눔
-  const sidePer = Math.max(2, Math.floor(total / 3));   // 왼쪽·오른쪽 각각 개수
-  const bottomPer = Math.max(0, total - sidePer * 2);   // 앞줄 개수
+      const nearZ = teacherZ + 4.0;
+      const farZ = teacherZ - 1.5;
 
-  const sideStepZ = sidePer > 1 ? (nearZ - farZ) / (sidePer - 1) : 0;
+      const sidePer = Math.max(2, Math.floor(total / 3));
+      const bottomPer = Math.max(0, total - sidePer * 2);
 
-  let idx = 0;
+      const sideStepZ = sidePer > 1 ? (nearZ - farZ) / (sidePer - 1) : 0;
 
-  // 왼쪽 팔
-  for (let i = 0; i < sidePer && idx < total; i++) {
-    const z = farZ + i * sideStepZ;
-    positions[idx++] = { x: leftX, z };
-  }
+      let idx = 0;
 
-  // 오른쪽 팔
-  for (let i = 0; i < sidePer && idx < total; i++) {
-    const z = farZ + i * sideStepZ;
-    positions[idx++] = { x: rightX, z };
-  }
+      for (let i = 0; i < sidePer && idx < total; i++) {
+        const z = farZ + i * sideStepZ;
+        positions[idx++] = { x: leftX, z };
+      }
 
-  // 앞줄 (카메라 쪽, 강의자를 바라보는 부분)
-  if (bottomPer > 0) {
-    const startX = leftX + 1.4;
-    const endX = rightX - 1.4;
-    const bottomStepX =
-      bottomPer > 1 ? (endX - startX) / (bottomPer - 1) : 0;
+      for (let i = 0; i < sidePer && idx < total; i++) {
+        const z = farZ + i * sideStepZ;
+        positions[idx++] = { x: rightX, z };
+      }
 
-    for (let i = 0; i < bottomPer && idx < total; i++) {
-      const x = startX + i * bottomStepX;
-      const z = nearZ;
-      positions[idx++] = { x, z };
+      if (bottomPer > 0) {
+        const startX = leftX + 1.4;
+        const endX = rightX - 1.4;
+        const bottomStepX =
+          bottomPer > 1 ? (endX - startX) / (bottomPer - 1) : 0;
+
+        for (let i = 0; i < bottomPer && idx < total; i++) {
+          const x = startX + i * bottomStepX;
+          const z = nearZ;
+          positions[idx++] = { x, z };
+        }
+      }
+
+      return positions;
     }
-  }
-
-  return positions;
-}
-
 
     function applyLayout(layout) {
       currentLayout = layout;
@@ -768,6 +807,8 @@ function layoutUShape() {
       if (layout === "groups") layoutName = "모둠형";
       if (layout === "u-shape") layoutName = "U자 배치";
       layoutStatus.textContent = `현재 배치: ${layoutName}`;
+
+      updatePromptPreview();
     }
 
     function hexToRgb(hex) {
@@ -802,6 +843,8 @@ function layoutUShape() {
         0.1
       );
       scene.background = bgColor;
+
+      updatePromptPreview();
     }
 
     function updateBrightness(value) {
@@ -822,12 +865,19 @@ function layoutUShape() {
         lightDot.style.background = "#fef9c3";
         lightDot.style.boxShadow = "0 0 13px rgba(254,249,195,1)";
       }
+
+      updatePromptPreview();
     }
 
     function updateTeacherPosition(v) {
       const t = (parseInt(v, 10) || 0) / 120;
       const offsetX = t * 4.0;
       teacherGroup.position.x = offsetX;
+
+      if (currentLayout === "u-shape") {
+        applyLayout("u-shape");
+      }
+      updatePromptPreview();
     }
 
     layoutButtons.forEach((btn) => {
@@ -893,12 +943,140 @@ function layoutUShape() {
       renderer.render(scene, camera);
     }
 
+    function getLayoutLabel(layoutKey) {
+      if (layoutKey === "rows") return "traditional rows facing the board";
+      if (layoutKey === "groups") return "small group tables of four students each";
+      if (layoutKey === "u-shape") return "a U-shaped layout surrounding the lecturer";
+      return layoutKey;
+    }
+
+    function buildSpecObject() {
+      return {
+        version: 1,
+        timestamp: new Date().toISOString(),
+        backgroundHex: colorPicker.value,
+        brightnessPercent: Number(brightnessRange.value),
+        deskCount: currentDeskCount,
+        layoutKey: currentLayout,
+        layoutDescription: getLayoutLabel(currentLayout),
+        teacherOffsetX: Number(teacherGroup.position.x.toFixed(2)),
+        teacherBaseZ: TEACHER_Z,
+        cameraPosition: {
+          x: Number(camera.position.x.toFixed(2)),
+          y: Number(camera.position.y.toFixed(2)),
+          z: Number(camera.position.z.toFixed(2)),
+        },
+        note: "All coordinates are in the same 3D coordinate system as the render.",
+      };
+    }
+
+    function buildPromptText(spec) {
+      const hex = spec.backgroundHex;
+      const layoutText = spec.layoutDescription;
+      const brightness = spec.brightnessPercent;
+      const teacherSide =
+        spec.teacherOffsetX < -0.5
+          ? "slightly on the left side of the room from the viewer's perspective"
+          : spec.teacherOffsetX > 0.5
+          ? "slightly on the right side of the room from the viewer's perspective"
+          : "roughly centered in front of the board";
+
+      return [
+        "You are an expert architectural visualizer and lighting designer.",
+        "Generate a single photorealistic image of an ideal university classroom that matches the following specification.",
+        "",
+        "High level mood:",
+        `- Overall accent color: ${hex} (use it subtly in wall tint, furniture details, or decoration).`,
+        `- Bright but comfortable lighting at about ${brightness}% of full brightness.`,
+        "",
+        "Layout and camera:",
+        `- Student desk layout: ${layoutText}.`,
+        `- Total student desks/chairs: ${spec.deskCount}.`,
+        `- The instructor's desk is ${teacherSide}.`,
+        "- The main board is on the front wall; the camera is placed near the back of the room, looking slightly downward toward the board.",
+        "",
+        "Geometry and realism:",
+        "- Use realistic proportions for desks, chairs and the board.",
+        "- Soft global illumination, subtle shadows, and believable materials (wood, plastic, painted walls, tiled or vinyl floor).",
+        "",
+        "IMPORTANT:",
+        "- Use the attached reference render as composition guidance (camera angle and approximate positions).",
+        "- You may refine materials, details and lighting, but keep the overall arrangement consistent with the reference.",
+      ].join("\n");
+    }
+
+    function updatePromptPreview() {
+      const spec = buildSpecObject();
+      const text = buildPromptText(spec);
+      promptPreview.value = text;
+    }
+
+    function downloadTextFile(filename, text) {
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadCanvasPng(filename = "classroom_capture.png") {
+      return new Promise((resolve) => {
+        // ★ 캡처 직전에 한 번 더 렌더링
+        renderer.render(scene, camera);
+
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            resolve();
+            return;
+          }
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          resolve();
+        }, "image/png");
+      });
+    }
+
+    async function exportSnapshotAndData() {
+      const spec = buildSpecObject();
+      const prompt = buildPromptText(spec);
+
+      const content =
+        "=== Classroom spec (JSON) ===\n" +
+        JSON.stringify(spec, null, 2) +
+        "\n\n=== AI prompt (copy & paste into your image model) ===\n\n" +
+        prompt +
+        "\n";
+
+      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+      downloadTextFile(`classroom_ideal_${stamp}.txt`, content);
+      await downloadCanvasPng(`classroom_ideal_${stamp}.png`);
+    }
+
+    refreshPromptBtn.addEventListener("click", () => {
+      updatePromptPreview();
+    });
+
+    exportAllBtn.addEventListener("click", () => {
+      exportSnapshotAndData();
+    });
+
     function init() {
       onResize();
       syncDeskCount();
       updateBackgroundColor(colorPicker.value);
       updateBrightness(brightnessRange.value);
       updateTeacherPosition(teacherPosRange.value);
+      updatePromptPreview();
       animate(performance.now());
     }
 
