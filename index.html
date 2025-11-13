@@ -13,8 +13,8 @@
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
-      background: #121212;
-      color: #f9f9f9;
+      background: radial-gradient(circle at top, #dfe7ff 0, #cdd8ff 35%, #b8c4f0 70%, #9ca9e0 100%);
+      color: #111827;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -26,8 +26,9 @@
       max-width: 1100px;
       padding: 24px;
       border-radius: 18px;
-      background: radial-gradient(circle at top, #2b3138 0, #181a20 50%, #111 100%);
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7);
+      background: rgba(15, 23, 42, 0.06);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 22px 55px rgba(15, 23, 42, 0.35);
       display: grid;
       grid-template-columns: minmax(270px, 320px) 1fr;
       gap: 20px;
@@ -42,8 +43,8 @@
     .panel {
       padding: 18px 18px 14px;
       border-radius: 14px;
-      background: rgba(10, 12, 18, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
       display: flex;
       flex-direction: column;
       gap: 18px;
@@ -52,18 +53,21 @@
     .panel h1 {
       font-size: 1.3rem;
       margin-bottom: 4px;
+      color: #0f172a;
     }
 
     .panel p {
       font-size: 0.85rem;
-      opacity: 0.7;
+      opacity: 0.8;
       line-height: 1.4;
+      color: #1f2937;
     }
 
     .section-title {
       font-size: 0.9rem;
       font-weight: 600;
       margin-bottom: 4px;
+      color: #0f172a;
     }
 
     .control-group {
@@ -80,7 +84,8 @@
 
     label {
       font-size: 0.8rem;
-      opacity: 0.8;
+      opacity: 0.85;
+      color: #111827;
     }
 
     input[type="color"] {
@@ -88,14 +93,14 @@
       height: 26px;
       padding: 0;
       border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(148, 163, 184, 0.8);
       background: transparent;
       cursor: pointer;
     }
 
     input[type="range"] {
       flex: 1;
-      accent-color: #ffcc66;
+      accent-color: #eab308;
       cursor: pointer;
     }
 
@@ -111,9 +116,9 @@
       min-width: 80px;
       padding: 6px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      background: rgba(255, 255, 255, 0.04);
-      color: #f9f9f9;
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      background: rgba(248, 250, 252, 0.9);
+      color: #0f172a;
       font-size: 0.78rem;
       cursor: pointer;
       transition: background 0.2s ease, transform 0.1s ease,
@@ -122,31 +127,32 @@
     }
 
     .layout-btn:hover {
-      background: rgba(255, 255, 255, 0.09);
+      background: rgba(239, 246, 255, 0.9);
       transform: translateY(-1px);
-      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 5px 12px rgba(148, 163, 184, 0.6);
     }
 
     .layout-btn.active {
-      background: linear-gradient(135deg, #ffb347, #ffcc66);
-      color: #202020;
-      border-color: rgba(0, 0, 0, 0.2);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+      background: linear-gradient(135deg, #f97316, #facc15);
+      color: #111827;
+      border-color: rgba(251, 146, 60, 0.9);
+      box-shadow: 0 10px 22px rgba(248, 181, 46, 0.75);
     }
 
     .info-note {
       margin-top: 4px;
       font-size: 0.78rem;
-      opacity: 0.7;
+      opacity: 0.75;
       line-height: 1.3;
+      color: #4b5563;
     }
 
     .room-wrapper {
       position: relative;
       border-radius: 14px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      background: #101217;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      background: #e5ecff;
     }
 
     .room-header {
@@ -154,8 +160,9 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 12px 8px;
-      background: radial-gradient(circle at top left, #25303d 0, #14161b 45%, #101218 100%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      border-bottom: 1px solid rgba(191, 219, 254, 0.9);
+      color: #eff6ff;
     }
 
     .room-header-title {
@@ -165,15 +172,15 @@
 
     .room-header-sub {
       font-size: 0.75rem;
-      opacity: 0.7;
+      opacity: 0.9;
     }
 
     .room-light-indicator {
       font-size: 0.72rem;
       padding: 4px 8px;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(219, 234, 254, 0.9);
+      background: rgba(15, 23, 42, 0.45);
       display: flex;
       align-items: center;
       gap: 5px;
@@ -183,17 +190,15 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: #ffd966;
-      box-shadow: 0 0 8px rgba(255, 217, 102, 0.9);
+      background: #facc15;
+      box-shadow: 0 0 8px rgba(250, 204, 21, 0.95);
     }
 
     .room-canvas {
       position: relative;
       height: 420px;
       padding: 10px;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      background: #e5ecff;
       transition: filter 0.25s ease, background-color 0.25s ease;
     }
 
@@ -203,22 +208,28 @@
       height: 100%;
       border-radius: 12px;
       overflow: hidden;
-      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.12) 0,
-          rgba(17, 20, 28, 0.96) 38%, rgba(6, 8, 13, 1) 100%);
-      box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(
+        180deg,
+        #f9fbff 0,
+        #edf3ff 40%,
+        #e4ecff 75%,
+        #dde7ff 100%
+      );
+      box-shadow: 0 18px 38px rgba(15, 23, 42, 0.25),
+        inset 0 0 40px rgba(148, 163, 184, 0.15);
+      border: 1px solid rgba(148, 163, 184, 0.7);
     }
 
     .wall-accent {
       position: absolute;
       inset: 0;
       pointer-events: none;
-      background: radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.08) 0,
-          transparent 40%),
-        radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.06) 0,
-          transparent 45%);
+      background: radial-gradient(circle at 20% 0%, rgba(59, 130, 246, 0.26) 0,
+          transparent 45%),
+        radial-gradient(circle at 80% 5%, rgba(129, 140, 248, 0.2) 0,
+          transparent 50%);
       mix-blend-mode: screen;
-      opacity: 0.7;
+      opacity: 0.8;
     }
 
     .blackboard {
@@ -229,9 +240,9 @@
       width: 75%;
       height: 80px;
       border-radius: 10px;
-      background: linear-gradient(135deg, #111c15, #060d09);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(135deg, #14532d, #052e16);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(167, 243, 208, 0.7);
       overflow: hidden;
     }
 
@@ -243,7 +254,7 @@
       font-size: 0.9rem;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.82);
+      color: rgba(240, 253, 250, 0.94);
     }
 
     .blackboard::after {
@@ -258,19 +269,19 @@
       background-repeat: no-repeat;
       background-position: center right 6px;
       opacity: 0.55;
-      filter: saturate(0.8);
+      filter: saturate(0.9);
     }
 
     .teacher-desk {
       position: absolute;
       top: 118px;
-      left: 50%;
+      left: calc(50% + var(--teacher-offset, 0px));
       transform: translateX(-50%);
       width: 110px;
       height: 40px;
       border-radius: 9px;
-      background: linear-gradient(145deg, #c28b5a, #8c5a2d);
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.55);
+      background: linear-gradient(145deg, #fbbf77, #c97a32);
+      box-shadow: 0 6px 14px rgba(30, 64, 175, 0.5);
     }
 
     .teacher-desk::before {
@@ -278,22 +289,22 @@
       position: absolute;
       inset: 3px 4px 8px;
       border-radius: 7px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.18),
-          rgba(255, 255, 255, 0.02));
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.24),
+          rgba(255, 255, 255, 0.06));
       mix-blend-mode: soft-light;
-      opacity: 0.9;
+      opacity: 0.95;
     }
 
     .teacher-chair {
       position: absolute;
       top: 154px;
-      left: 50%;
+      left: calc(50% + var(--teacher-offset, 0px));
       transform: translateX(-50%);
       width: 46px;
       height: 26px;
-      background: linear-gradient(145deg, #343b4a, #181c25);
+      background: linear-gradient(145deg, #4b5563, #1f2937);
       border-radius: 10px 10px 6px 6px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.68);
     }
 
     .teacher-chair::after {
@@ -305,7 +316,7 @@
       height: 18px;
       transform: translateX(-50%);
       border-radius: 10px 10px 4px 4px;
-      background: linear-gradient(135deg, #505a6e, #222632);
+      background: linear-gradient(135deg, #6b7280, #111827);
     }
 
     .student-area {
@@ -321,8 +332,8 @@
       width: 80px;
       height: 52px;
       border-radius: 9px;
-      background: linear-gradient(145deg, #c99863, #8a5b2f);
-      box-shadow: 0 8px 17px rgba(0, 0, 0, 0.6);
+      background: linear-gradient(145deg, #fed7aa, #f97316);
+      box-shadow: 0 8px 17px rgba(15, 23, 42, 0.55);
       transition: transform 0.6s ease, left 0.6s ease, top 0.6s ease;
       display: flex;
       justify-content: center;
@@ -335,9 +346,9 @@
       position: absolute;
       inset: 3px 4px 16px;
       border-radius: 7px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12),
-          rgba(255, 255, 255, 0.02));
-      opacity: 0.9;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.18),
+          rgba(255, 255, 255, 0.06));
+      opacity: 0.95;
       pointer-events: none;
     }
 
@@ -346,8 +357,8 @@
       width: 60%;
       height: 20px;
       border-radius: 8px 8px 4px 4px;
-      background: linear-gradient(145deg, #434a5b, #1f222c);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.7);
+      background: linear-gradient(145deg, #4b5563, #111827);
+      box-shadow: 0 3px 8px rgba(15, 23, 42, 0.8);
     }
 
     .desk .chair::after {
@@ -359,7 +370,7 @@
       width: 100%;
       height: 12px;
       border-radius: 8px 8px 4px 4px;
-      background: linear-gradient(135deg, #606980, #22252f);
+      background: linear-gradient(135deg, #6b7280, #111827);
     }
 
     .desk label {
@@ -367,39 +378,9 @@
       top: 2px;
       right: 6px;
       font-size: 0.65rem;
-      opacity: 0.7;
-      color: #1d1207;
-      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    }
-
-    .room-floor {
-      position: absolute;
-      inset: auto 0 0 0;
-      height: 28%;
-      background-image: linear-gradient(135deg, #1d1f26 0, #171922 45%, #14151e 100%);
-      box-shadow: inset 0 14px 25px rgba(0, 0, 0, 0.8);
-    }
-
-    .room-floor::before {
-      content: "";
-      position: absolute;
-      inset: 8% 8% auto 8%;
-      height: 3px;
-      background: linear-gradient(90deg, rgba(255, 255, 255, 0.06),
-          rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.06));
-      opacity: 0.9;
-    }
-
-    .room-floor::after {
-      content: "";
-      position: absolute;
-      inset: 35% 8% 10% 8%;
-      background-size: 22px 22px;
-      background-image: linear-gradient(to right, rgba(0, 0, 0, 0.5) 1px,
-          transparent 1px),
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.55) 1px,
-          transparent 1px);
-      opacity: 0.28;
+      opacity: 0.85;
+      color: #7c2d12;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
     }
 
     .status-bar {
@@ -409,16 +390,17 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(0, 0, 0, 0.55);
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(15, 23, 42, 0.8);
+      border-top: 1px solid rgba(148, 163, 184, 0.8);
+      color: #e5edff;
     }
 
     .status-layout {
-      opacity: 0.78;
+      opacity: 0.9;
     }
 
     .status-hint {
-      opacity: 0.7;
+      opacity: 0.8;
       font-size: 0.72rem;
     }
   </style>
@@ -428,8 +410,10 @@
     <div class="panel">
       <div>
         <h1>강의실 시뮬레이터</h1>
-        <p>배경 색감과 조도를 조절하고, 책상/의자 배치를 바꾸면서
-          강의실 분위기를 실험해 볼 수 있어.</p>
+        <p>
+          배경 색감과 조도를 조절하고, 책상/의자 배치를 바꾸면서
+          강의실 분위기를 실험해 볼 수 있어.
+        </p>
       </div>
 
       <div class="control-group">
@@ -439,7 +423,8 @@
           <input type="color" id="colorPicker" value="#3a6ea5" />
         </div>
         <div class="info-note">
-          벽 전체 톤을 바꾸는 느낌으로 생각하면 돼.
+          벽·바닥 전체 톤이 선택한 색으로 강하게 바뀌어. 집중/몰입
+          컨셉 색을 골라봐.
         </div>
       </div>
 
@@ -447,12 +432,37 @@
         <div class="section-title">조도 (밝기)</div>
         <div class="control-row">
           <label for="brightnessRange">어두움</label>
-          <input type="range" id="brightnessRange" min="30" max="130" value="90" />
-          <span style="font-size: 0.8rem; opacity: 0.8;">밝음</span>
+          <input
+            type="range"
+            id="brightnessRange"
+            min="60"
+            max="180"
+            value="110"
+          />
+          <span style="font-size: 0.8rem; opacity: 0.8">밝음</span>
         </div>
         <div class="info-note">
-          조도가 높을수록 전체가 밝아지고, 낮을수록 집중도 높은
-          어두운 강의실이 돼.
+          조도를 높이면 실제 교실 형광등을 더 켠 것처럼 확실히
+          밝아져. (최대값은 꽤 눈부신 수준)
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="section-title">교수자 위치</div>
+        <div class="control-row">
+          <label for="teacherPosRange">왼쪽</label>
+          <input
+            type="range"
+            id="teacherPosRange"
+            min="-120"
+            max="120"
+            value="0"
+          />
+          <span style="font-size: 0.8rem; opacity: 0.8">오른쪽</span>
+        </div>
+        <div class="info-note">
+          강의대와 교수자 의자가 함께 움직여. 좌우 배치에 따라
+          학생 배치도 다르게 느껴질 수 있어.
         </div>
       </div>
 
@@ -460,12 +470,12 @@
         <div class="section-title">책상/의자 배치</div>
         <div class="layout-buttons">
           <button class="layout-btn active" data-layout="rows">줄세우기</button>
-          <button class="layout-btn" data-layout="groups">모둠형</button>
+          <button class="layout-btn" data-layout="groups">모둠형 (4-4-4)</button>
           <button class="layout-btn" data-layout="u-shape">U자 배치</button>
         </div>
         <div class="info-note">
           버튼을 누를 때마다 책상이 부드럽게 움직이면서 배치가
-          바뀌어. 학생 수는 12명으로 가정했어.
+          바뀌어. 학생 수는 12명으로 가정했어 (4명×3모둠).
         </div>
       </div>
     </div>
@@ -478,7 +488,7 @@
         </div>
         <div class="room-light-indicator">
           <span class="room-light-dot" id="lightDot"></span>
-          <span id="lightLabel">조도: 90%</span>
+          <span id="lightLabel">조도: 110%</span>
         </div>
       </div>
       <div class="room-canvas" id="roomCanvas">
@@ -488,7 +498,6 @@
           <div class="teacher-desk"></div>
           <div class="teacher-chair"></div>
           <div class="student-area" id="studentArea"></div>
-          <div class="room-floor"></div>
         </div>
       </div>
       <div class="status-bar">
@@ -506,12 +515,15 @@
     const brightnessRange = document.getElementById("brightnessRange");
     const roomCanvas = document.getElementById("roomCanvas");
     const roomInner = document.getElementById("roomInner");
+    const wallAccent = document.querySelector(".wall-accent");
     const lightLabel = document.getElementById("lightLabel");
     const lightDot = document.getElementById("lightDot");
+    const teacherPosRange = document.getElementById("teacherPosRange");
 
     const deskCount = 12;
     const desks = [];
 
+    // 책상 생성
     for (let i = 0; i < deskCount; i++) {
       const desk = document.createElement("div");
       desk.className = "desk";
@@ -552,17 +564,17 @@
           }
         }
       } else if (layout === "groups") {
+        // 4명씩 x 3모둠
         const groupCenters = [
-          { x: w * 0.25, y: h * 0.3 },
-          { x: w * 0.75, y: h * 0.3 },
-          { x: w * 0.25, y: h * 0.75 },
-          { x: w * 0.75, y: h * 0.75 },
+          { x: w * 0.22, y: h * 0.35 },
+          { x: w * 0.5, y: h * 0.7 },
+          { x: w * 0.78, y: h * 0.35 },
         ];
         const offsets = [
-          { x: -30, y: -24 },
-          { x: 30, y: -24 },
-          { x: -30, y: 24 },
-          { x: 30, y: 24 },
+          { x: -30, y: -22 },
+          { x: 30, y: -22 },
+          { x: -30, y: 22 },
+          { x: 30, y: 22 },
         ];
 
         let idx = 0;
@@ -628,9 +640,15 @@
       currentLayout = layout;
       const positions = getLayoutPositions(layout);
 
-      studentArea.classList.remove("no-animation");
       if (!animate) {
-        studentArea.classList.add("no-animation");
+        desks.forEach((desk) => {
+          desk.style.transition = "none";
+        });
+      } else {
+        desks.forEach((desk) => {
+          desk.style.transition =
+            "transform 0.6s ease, left 0.6s ease, top 0.6s ease";
+        });
       }
 
       desks.forEach((desk, i) => {
@@ -646,32 +664,54 @@
       });
 
       let layoutName = "줄세우기";
-      if (layout === "groups") layoutName = "모둠형";
+      if (layout === "groups") layoutName = "모둠형 (4-4-4)";
       if (layout === "u-shape") layoutName = "U자 배치";
       layoutStatus.textContent = `현재 배치: ${layoutName}`;
     }
 
     function updateBackgroundColor(color) {
-      roomInner.style.background = `radial-gradient(circle at top, ${hexToRgba(
+      // 교실 전체 색감을 선택한 컬러 중심으로 크게 바꿔줌
+      roomInner.style.background = `linear-gradient(
+        180deg,
+        ${hexToRgba(color, 0.95)} 0%,
+        ${hexToRgba(color, 0.75)} 35%,
+        ${hexToRgba(color, 0.55)} 65%,
+        rgba(244, 247, 255, 1) 100%
+      )`;
+
+      roomInner.style.boxShadow = `0 20px 40px ${hexToRgba(
         color,
         0.4
-      )} 0, rgba(5, 7, 12, 0.96) 40%, rgba(3, 5, 10, 1) 100%)`;
+      )}, inset 0 0 40px rgba(15,23,42,0.18)`;
+
+      if (wallAccent) {
+        wallAccent.style.background = `
+          radial-gradient(circle at 20% 0%, ${hexToRgba(
+            color,
+            0.45
+          )} 0, transparent 45%),
+          radial-gradient(circle at 80% 5%, ${hexToRgba(
+            color,
+            0.3
+          )} 0, transparent 50%)
+        `;
+      }
     }
 
     function updateBrightness(value) {
-      const brightness = value / 100;
+      const brightness = value / 100; // 0.6 ~ 1.8
       roomCanvas.style.filter = `brightness(${brightness})`;
       lightLabel.textContent = `조도: ${value}%`;
 
-      if (value < 50) {
-        lightDot.style.background = "#ff9933";
-        lightDot.style.boxShadow = "0 0 10px rgba(255,153,51,0.9)";
-      } else if (value < 90) {
-        lightDot.style.background = "#ffd966";
-        lightDot.style.boxShadow = "0 0 10px rgba(255,217,102,0.95)";
+      if (value < 80) {
+        lightDot.style.background = "#f97316";
+        lightDot.style.boxShadow = "0 0 10px rgba(249,115,22,0.95)";
+      } else if (value < 130) {
+        lightDot.style.background = "#facc15";
+        lightDot.style.boxShadow = "0 0 11px rgba(250,204,21,1)";
       } else {
-        lightDot.style.background = "#fff4b2";
-        lightDot.style.boxShadow = "0 0 12px rgba(255,244,178,1)";
+        lightDot.style.background = "#fef9c3";
+        lightDot.style.boxShadow = "0 0 13px rgba(254,249,195,1)";
       }
     }
 
@@ -689,6 +729,7 @@
       return `rgba(${r},${g},${b},${alpha})`;
     }
 
+    // 배치 버튼 이벤트
     layoutButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
         const layout = btn.dataset.layout;
@@ -697,17 +738,26 @@
       });
     });
 
+    // 색감 조절
     colorPicker.addEventListener("input", (e) => {
       updateBackgroundColor(e.target.value);
     });
 
+    // 조도 조절
     brightnessRange.addEventListener("input", (e) => {
       updateBrightness(e.target.value);
+    });
+
+    // 교수자 위치 조절
+    teacherPosRange.addEventListener("input", (e) => {
+      const v = parseInt(e.target.value, 10) || 0;
+      roomInner.style.setProperty("--teacher-offset", `${v}px`);
     });
 
     function init() {
       updateBackgroundColor(colorPicker.value);
       updateBrightness(brightnessRange.value);
+      roomInner.style.setProperty("--teacher-offset", "0px");
       applyLayout("rows", false);
 
       window.addEventListener("resize", () => {
